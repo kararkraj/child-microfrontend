@@ -1,8 +1,13 @@
-import { NgModule } from '@angular/core';
+import { ApplicationRef, DoBootstrap, Injector, NgModule } from '@angular/core';
+import { createCustomElement } from '@angular/elements';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SampleComponent } from './sample/sample.component';
+import { SampleModule } from './sample/sample.module';
+
+const local = false;
 
 @NgModule({
   declarations: [
@@ -10,9 +15,23 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    SampleModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [ local ? AppComponent : []],
+  entryComponents: [SampleComponent]
 })
-export class AppModule { }
+export class AppModule implements DoBootstrap {
+  constructor(
+    private injector: Injector
+  ) {
+    const micro = createCustomElement(SampleComponent, { injector: this.injector });
+    customElements.define('micro-app', micro);
+  }
+
+  ngDoBootstrap(appRef: ApplicationRef): void {
+
+  }
+}
+
